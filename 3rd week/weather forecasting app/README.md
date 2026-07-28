@@ -14,7 +14,6 @@ A modern dashboard that predicts weather conditions from environmental data usin
 
 </div>
 
----
 
 ## ✨ Overview
 
@@ -22,7 +21,6 @@ A modern dashboard that predicts weather conditions from environmental data usin
 
 Designed with both functionality and aesthetics in mind, the app features a clean, responsive UI with a modern glassmorphism design and full dark mode support.
 
----
 
 ## 🚀 Key Features
 
@@ -37,7 +35,6 @@ Designed with both functionality and aesthetics in mind, the app features a clea
 | ⏳ **UX Polish** | Loading spinners, weather icons, responsive layout |
 | 💖 **Design** | Modern glassmorphism-inspired UI |
 
----
 
 ## 🛠 Tech Stack
 
@@ -72,7 +69,6 @@ Designed with both functionality and aesthetics in mind, the app features a clea
 </tr>
 </table>
 
----
 
 ## 📂 Project Structure
 
@@ -99,7 +95,6 @@ Weather-Forecasting-Dashboard/
 └── README.md
 ```
 
----
 
 ## 📊 Input Parameters
 
@@ -112,7 +107,6 @@ The model generates predictions based on the following environmental features:
 | ☀️ UV Index | 🍂 Season | 👁️ Visibility |
 | 📍 Location | | |
 
----
 
 ## 🤖 Machine Learning Models
 
@@ -124,7 +118,6 @@ Users can select from **three trained models** before generating a prediction:
 
 Each model is pre-trained and served via the FastAPI backend using `joblib`.
 
----
 
 ## 🔐 Authentication
 
@@ -136,7 +129,6 @@ The application includes a complete auth flow:
 
 All credentials are stored securely in the SQLite database.
 
----
 
 ## 📈 Prediction History
 
@@ -149,7 +141,6 @@ Every prediction made by a user is automatically saved and displayed in a histor
 
 This allows users to track and review their past forecasts at any time.
 
----
 
 ## 🚀 Getting Started
 
@@ -175,7 +166,6 @@ npm run dev
 ```
 Frontend will start at: `http://localhost:5173`
 
----
 
 ## 📷 Dashboard Highlights
 
@@ -188,7 +178,6 @@ Frontend will start at: `http://localhost:5173`
 - ✅ Real-time Input Validation
 - 📱 Fully Responsive Design
 
----
 
 ## 🎯 Roadmap / Future Improvements
 
@@ -199,20 +188,17 @@ Frontend will start at: `http://localhost:5173`
 - [ ] 📧 Email Notifications
 - [ ] 🧠 AI-based Weather Recommendations
 
----
 
 ## 👩‍💻 Developer
 
 **Alishba Asif**
 *AI Engineer*
 
----
 
 ## 📜 License
 
 This project is developed for **educational and internship purposes**.
 
----
 
 <div align="center">
 
