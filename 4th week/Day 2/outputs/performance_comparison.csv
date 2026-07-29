@@ -1,0 +1,4 @@
+Model,MAE,MSE,RMSE,R2 Score,Training Time (s),Remarks
+RNN,2.539,9.868,3.141,0.835,17.37,Fastest; weaker long-range memory
+LSTM,2.932,12.996,3.605,0.783,16.75,Best long-range memory; most parameters
+GRU,2.701,11.344,3.368,0.811,34.59,"Near-LSTM accuracy; fewer params, faster"
