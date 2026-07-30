@@ -74,19 +74,19 @@ RNN/LSTM/GRU models need fixed-length inputs. The **sliding window** technique t
 ## 2. Project
 
 ### Dataset
-This project uses a **synthetically generated** daily OHLCV price series (`data/generate_data.py`), built by combining trend + seasonality + cycle + noise — because this sandbox's network cannot reach Yahoo Finance/Kaggle to download a real dataset.
+This project uses **real daily price data for Apple Inc. (AAPL)** — `data/apple_stock_prices.csv`, covering **1255 trading days from 2020-06-04 to 2025-06-02**, with columns `Date, Open, High, Low, Close, Volume` and no missing values. Only the `Close` price is used as the forecasting target.
 
-The generated CSV (`data/stock_prices.csv`) uses the **same schema** as a real export (`Date, Open, High, Low, Close, Volume`), so you can swap in a real Tesla/Apple/Google (or weather/power-consumption) CSV at `data/stock_prices.csv` and every downstream step works unchanged. To regenerate synthetic data: `python data/generate_data.py`.
+The pipeline is dataset-agnostic — swap in any other Tesla/Google/weather/power-consumption CSV with the same schema at `data/` and every downstream step works unchanged.
 
 ### Methodology / Pipeline
 ```
 Raw Stock Data → Clean & Normalize → Sliding Window → Train RNN/LSTM/GRU → Evaluate → Compare & Forecast
 ```
-- **Window size:** 30 days
+- **Window size:** 20 days
 - **Train/Test split:** 80/20, chronological (no shuffling — avoids leaking future data into training)
-- **Architecture (all 3 models, matched capacity):** 2 stacked layers, 64 hidden units, dropout 0.2
+- **Architecture (all 3 models, matched capacity):** 1 recurrent layer, 24 hidden units (scale up to 2 layers / 64 units for a heavier run)
 - **Optimizer / Loss:** Adam, MSE
-- **Epochs / Batch size:** 60 / 32
+- **Epochs / Batch size:** 40 / 32
 
 ### Tasks Implemented
 1. **Data Preprocessing** (`src/preprocessing.py`): load → interpolate missing values → MinMax normalize → sliding-window sequences → chronological train/test split.
@@ -139,19 +139,21 @@ All saved to `outputs/`:
 
 | Model | MAE | MSE | RMSE | R² Score | Training Time (s) | Remarks |
 |---|---|---|---|---|---|---|
-| RNN | 2.539 | 9.868 | 3.141 | 0.835 | 17.37 | Fastest; weaker long-range memory |
-| LSTM | 2.932 | 12.996 | 3.605 | 0.783 | 16.75 | Best long-range memory; most parameters |
-| GRU | 2.701 | 11.344 | 3.368 | 0.811 | 34.59 | Near-LSTM accuracy; fewer params, faster |
+| RNN | 6.963 | 66.644 | 8.164 | 0.718 | 0.73 | Fastest; lowest error on this run |
+| LSTM | 8.127 | 90.442 | 9.510 | 0.618 | 3.91 | Strong long-range memory; most parameters |
+| GRU | 8.590 | 95.426 | 9.769 | 0.597 | 3.10 | Near-LSTM behavior; fewer params |
 
 *(Full table + styled image also available at `outputs/performance_comparison.csv` and `outputs/performance_comparison_table.png`. Exact numbers will vary slightly on re-run due to random initialization.)*
+
+> **Note:** this sandbox has no PyTorch/internet access, so the numbers above were produced with a lightweight, single-layer configuration (24 hidden units, 40 epochs, 20-day window) run on the real Apple data using a from-scratch NumPy re-implementation of the same architectures — the shipped `src/` code itself is standard PyTorch and unchanged in structure. **Re-run the notebook in a PyTorch environment (Colab or local) before final submission** to regenerate the official numbers, plots, and `.pth` files.
 
 ### Discussion
 
 **Which model produced the most accurate forecasts?**
-On this run, the **RNN** achieved the lowest RMSE / highest R², though LSTM and GRU remained close behind. This is partly a feature of the synthetic dataset's relatively short window size (30 days) — LSTM/GRU's advantage grows on data with longer-range dependencies. In general, for daily stock-level data, **LSTM and GRU tend to generalize better as sequence length grows**, because their gating mechanisms preserve relevant information over longer windows without the vanishing-gradient problem that affects vanilla RNNs.
+On the real AAPL close-price series with a 20-day window, the **RNN** achieved the lowest RMSE / highest R² in this run, with LSTM and GRU close behind. This doesn't contradict the usual theory — gated units (LSTM/GRU) mainly earn their advantage on *longer* sequences where vanishing gradients hurt a plain RNN; at a short window and light training budget, the simpler RNN converges faster. In general, for daily stock-level data, **LSTM and GRU tend to generalize better as sequence length grows**, because their gating mechanisms preserve relevant information over longer windows without the vanishing-gradient problem that affects vanilla RNNs.
 
 **How did sequence length affect the results?**
-Increasing `window_size` gives the model more historical context, which helps up to a point — beyond that, returns diminish and training slows, with higher overfitting risk (especially for the simple RNN). Re-running with `window_size = 10, 30, 60` in the notebook shows this trade-off directly in the metrics.
+A 20-day window was used here for faster training. Increasing `window_size` gives the model more historical context, which helps up to a point — beyond that, returns diminish and training slows, with higher overfitting risk (especially for the simple RNN). Re-running with `window_size = 10, 30, 60` in the notebook shows this trade-off directly in the metrics.
 
 **Advantages and disadvantages of each model:**
 
@@ -190,7 +192,6 @@ Covers: Research Problem, Dataset, Model Architecture, Results, Strengths, Limit
 
 ```bash
 pip install -r requirements.txt
-python data/generate_data.py                       # (re)generate the dataset, or drop in your own CSV
 python train_and_export.py                          # trains all 3 models, saves .pth files + graphs + table
 jupyter notebook Time_Series_Forecasting_RNN_LSTM_GRU.ipynb   # full walkthrough notebook
 ```
@@ -206,8 +207,7 @@ jupyter notebook Time_Series_Forecasting_RNN_LSTM_GRU.ipynb   # full walkthrough
 ├── requirements.txt
 ├── train_and_export.py            # trains models, saves .pth + graphs + comparison table
 ├── data/
-│   ├── generate_data.py           # synthetic dataset generator
-│   └── stock_prices.csv           # generated dataset
+│   └── apple_stock_prices.csv     # real Apple (AAPL) daily OHLCV data, 2020-06-04 to 2025-06-02
 ├── src/
 │   ├── preprocessing.py           # loading, cleaning, normalization, sliding window, split
 │   ├── models.py                  # RNN / LSTM / GRU model definitions (PyTorch)
